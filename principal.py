@@ -75,8 +75,8 @@ class MainWindow(tk.Tk):
         self.mesa_valor_entry.insert(0, "1")  # Sample mesa number
         self.mesa_valor_entry.grid(row=1, column=1, padx=10)
 
-        mover_mesa_button = ttk.Button(details_frame, text="Mover mesa", command=self.move_table)
-        mover_mesa_button.grid(row=1, column=2)
+        # mover_mesa_button = ttk.Button(details_frame, text="Mover mesa", command=self.move_table)
+        # mover_mesa_button.grid(row=1, column=2)
 
         cantidad_label = ttk.Label(details_frame, text="Cantidad de producto:")
         cantidad_label.grid(row=1, column=3, sticky="e")
