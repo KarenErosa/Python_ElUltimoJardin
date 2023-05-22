@@ -75,8 +75,18 @@ class MainWindow(tk.Tk):
         self.mesa_valor_entry.insert(0, "1")  # Sample mesa number
         self.mesa_valor_entry.grid(row=1, column=1, padx=10)
 
-        mover_mesa_button = ttk.Button(details_frame, text="Mover Mesa", command=self.move_table)
+        mover_mesa_button = ttk.Button(details_frame, text="Mover mesa", command=self.move_table)
         mover_mesa_button.grid(row=1, column=2)
+
+        cantidad_label = ttk.Label(details_frame, text="Cantidad de producto:")
+        cantidad_label.grid(row=1, column=3, sticky="e")
+
+        self.cantidad_valor_entry = ttk.Entry(details_frame, state="readonly")
+        self.cantidad_valor_entry.insert(0, "1")  # Sample cantidad number
+        self.cantidad_valor_entry.grid(row=1, column=4, padx=10)
+
+        cantidad_button = ttk.Button(details_frame, text="Cambiar cantidad", command=self.cambiar_cantidad)
+        cantidad_button.grid(row=1, column=5)
 
         # Transaction Table
         table_frame = ttk.Frame(self)
@@ -147,7 +157,45 @@ class MainWindow(tk.Tk):
             label = ttk.Label(images_frame, text=name, relief="solid", width=20)
             label.pack(padx=10, pady=10)
             label.bind("<Button-1>", self.change_color)
+        
+        self.table.bind('<ButtonRelease-1>', self.on_table_row_click)
     
+    def cambiar_cantidad(self):
+        try:
+            self.data_table[self.mesa_valor_entry.get()]
+            selected_item = self.table.focus()  # Get the selected item
+            row_data = self.table.item(selected_item)  # Retrieve the row data
+
+            # Retrieve the values of each column
+            cantidad = row_data['values'][0]
+            producto = row_data['values'][1]
+            precio = row_data['values'][2]
+            total = row_data['values'][3]
+            for data in self.data_table[self.mesa_valor_entry.get()]:
+                if(str(data[1]) == str(producto) and str(data[2]) == str(precio) and str(data[3]) == str(cantidad) and str(data[4]) == str(total)):
+                    data[3] = self.cantidad_valor_entry.get()
+                    num = float(precio)
+                    total = num*float(self.cantidad_valor_entry.get())
+                    print(self.total_table[self.mesa_valor_entry.get()])
+                    self.total_table[self.mesa_valor_entry.get()] -= float(data[4])
+                    self.total_table[self.mesa_valor_entry.get()] += float(total)
+                    data[4] = total
+                    break
+            self.clear_table()
+        except Exception as e:
+            print(str(e))
+            messagebox.showerror("Error", f"Datos inválidos o no se ha seleccionado columna")
+            
+    def on_table_row_click(self, event):
+        selected_row = self.table.focus()  # Get the selected row
+        if selected_row:  # If a row is selected
+            values = self.table.item(selected_row)['values']  # Get the values of the selected row
+            first_column_value = values[0]  # Retrieve the value from the first column
+            self.cantidad_valor_entry.config(state="normal")  # Enable the entry widget
+            self.cantidad_valor_entry.delete(0, 'end')  # Clear the existing value
+            self.cantidad_valor_entry.insert(0, first_column_value)  # Insert the new value
+            # self.cantidad_valor_entry.config(state="readonly")  # Disable the entry widget
+
     def llenarEmpleados(self):
          # Connect to SQLite database
         connection = sqlite3.connect("BaseDeDatos/ElUltimoJardin.db")
