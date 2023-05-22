@@ -3,6 +3,7 @@ from tkinter import ttk
 from tkinter import scrolledtext
 from datetime import date
 from productos import Orden
+from registrar_empleados import ViewRegistrarTrabajador
 import sqlite3
 from tkinter import messagebox
 from datetime import datetime
@@ -36,12 +37,13 @@ class MainWindow(tk.Tk):
         # File Menu
         file_menu = tk.Menu(menu_bar, tearoff=0)
         menu_bar.add_cascade(label="Productos", menu=file_menu)
-        file_menu.add_command(label="Productos", command=self.open_product_table_window)
+        file_menu.add_command(label="Ver", command=self.open_product_table_window)
 
         # Edit Menu
         edit_menu = tk.Menu(menu_bar, tearoff=0)
         menu_bar.add_cascade(label="Empleados", menu=edit_menu)
-        edit_menu.add_command(label="Empleados", command=self.open_employee_table_window)
+        edit_menu.add_command(label="Ver", command=self.open_employee_table_window)
+        edit_menu.add_command(label="Agregar", command=self.empleados_add)
 
         # View Menu
         view_menu = tk.Menu(menu_bar, tearoff=0)
@@ -144,6 +146,29 @@ class MainWindow(tk.Tk):
             label = ttk.Label(images_frame, text=name, relief="solid", width=20)
             label.pack(padx=10, pady=10)
             label.bind("<Button-1>", self.change_color)
+    
+    def llenarEmpleados(self):
+         # Connect to SQLite database
+        connection = sqlite3.connect("BaseDeDatos/ElUltimoJardin.db")
+        cursor = connection.cursor()
+
+        # Fetch usernames from empleados database
+        cursor.execute("SELECT username FROM empleados")
+        usernames = cursor.fetchall()
+
+        # Close the database connection
+        connection.close()
+
+        usernames = [username[0] for username in usernames]
+
+        self.mesero_combo.config(state="normal")
+        self.mesero_combo['values'] = ()
+        self.mesero_combo['values'] = usernames
+        self.mesero_combo.config(state="readonly")
+
+        # Convert the usernames to a list
+
+        self.mesero_combo.set(usernames[0] if usernames else "")
 
     def open_product_table_window(self):
         # Create a new window
@@ -302,7 +327,10 @@ class MainWindow(tk.Tk):
         self.mesa_valor_entry.insert(0, label["text"])  # Set the clicked label's text as the input value
         self.mesa_valor_entry.config(state="readonly")  # Set the 
         self.clear_table()
-
+    
+    def empleados_add(self):
+        empleados = ViewRegistrarTrabajador(self)
+        empleados.mainloop()
 
 # Create an instance of the MainWindow class and run the application
 if __name__ == "__main__":

@@ -11,6 +11,7 @@ class ViewRegistrarTrabajador(tk.Toplevel):
     #y se definen los elementos que tendrá la ventana
     def __init__(self, parent):
         super().__init__(parent)
+        self.main_window = parent;
         # Crear la ventana
         self.title("Registro de Trabajador")
         self.geometry("700x600")  # Cambia el tamaño de la ventana (ancho x alto)
@@ -104,7 +105,6 @@ class ViewRegistrarTrabajador(tk.Toplevel):
         ap_mat = self.entry_ap_materno.get()
         username = self.entry_username.get()
         password = self.entry_password.get()
-
         if nombre == "":
             messagebox.showerror("Error", "Debes ingresar un nombre.")
         elif horario == "":
@@ -129,9 +129,10 @@ class ViewRegistrarTrabajador(tk.Toplevel):
                 
                 try:
                     # Ejecutar una operación que puede generar una excepción de unicidad
-                    cursor.execute("INSERT INTO empleados (nombre, apellido_paterno, apellido_materno, username, password, horario) VALUES (?, ?, ?, ?, ?, ?)", (nombre, ap_pat, ap_mat, username, password_hash, horario))
+                    cursor.execute("INSERT INTO empleados (nombre, apellido_paterno, apellido_materno, username, contrasena, horario) VALUES (?, ?, ?, ?, ?, ?)", (nombre, ap_pat, ap_mat, username, password_hash, horario))
                     conn.conn.commit()
                     messagebox.showinfo("Registro exitoso", f"Trabajador {nombre}, y nombre de usuario {username} registrado con horario {horario}.")
+                    self.main_window.llenarEmpleados()
                 except IntegrityError:
                     # Manejar la excepción de unicidad
                     messagebox.showerror("Error", "El nombre de usuario ya existe")
