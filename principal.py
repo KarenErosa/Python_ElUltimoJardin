@@ -5,6 +5,7 @@ from datetime import date
 from productos import Orden
 import sqlite3
 from tkinter import messagebox
+from datetime import datetime
 
 
 class MainWindow(tk.Tk):
@@ -53,7 +54,7 @@ class MainWindow(tk.Tk):
         fecha_label = ttk.Label(details_frame, text="Fecha:")
         fecha_label.grid(row=0, column=0, sticky="e")
 
-        today = date.today().strftime("%d/%m/%Y")
+        today = datetime.now().strftime("%d/%m/%Y")
         fecha_valor_label = ttk.Label(details_frame, text=today)
         fecha_valor_label.grid(row=0, column=1, padx=10)
 
@@ -94,6 +95,9 @@ class MainWindow(tk.Tk):
 
         eliminar_button = ttk.Button(buttons_frame, text="Eliminar Producto", command=self.delete_product)
         eliminar_button.pack(side="left", padx=10)
+
+        venta_button = ttk.Button(buttons_frame, text="Finalizar venta", command=self.venta)
+        venta_button.pack(side="left", padx=10)
 
         total_label = ttk.Label(buttons_frame, text="Total:")
         total_label.pack(side="left", padx=10)
@@ -262,6 +266,31 @@ class MainWindow(tk.Tk):
                 self.data_table[self.mesa_valor_entry.get()].remove(data)
         self.total_table[self.mesa_valor_entry.get()] -= float(total)
         self.clear_table()
+    
+    def venta(self):
+        # Connect to the database and retrieve the product data
+        fecha = datetime.now().strftime("%d/%m/%Y")
+        hora = datetime.now().strftime("%H:%M:%S")
+        for item in self.table.get_children():
+            values = self.table.item(item)['values']
+            print(values)
+            
+        try:
+            conn = sqlite3.connect("BaseDeDatos/ElUltimoJardin.db")  # Replace with the actual database file name
+            cursor = conn.cursor()
+
+            # Retrieve product data from the database
+            cursor.execute("SELECT username, nombre, apellido_paterno, apellido_materno FROM empleados")
+            rows = cursor.fetchall()
+
+            # Insert the product data into the table
+            # for row in rows:
+            #     product_table.insert("", "end", values=row)
+
+            conn.close()
+
+        except sqlite3.Error as e:
+            messagebox.showerror("Error", f"Error accessing the database: {str(e)}")
          
         
             
