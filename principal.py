@@ -3,6 +3,73 @@ from tkinter import ttk
 from tkinter import scrolledtext
 from datetime import date
 from productos import Orden
+import sqlite3
+from tkinter import messagebox
+
+def open_product_table_window():
+    # Create a new window
+    product_table_window = tk.Toplevel(window)
+    product_table_window.title("Tabla de Productos")
+
+    # Create a Treeview widget to display the table
+    product_table = ttk.Treeview(product_table_window, columns=("nombre", "precio"), show="headings")
+    product_table.heading("nombre", text="Nombre")
+    product_table.heading("precio", text="Precio")
+
+    # Connect to the database and retrieve the product data
+    try:
+        conn = sqlite3.connect("BaseDeDatos/ElUltimoJardin.db")  # Replace with the actual database file name
+        cursor = conn.cursor()
+
+        # Retrieve product data from the database
+        cursor.execute("SELECT nombre, precio FROM productos")
+        rows = cursor.fetchall()
+
+        # Insert the product data into the table
+        for row in rows:
+            product_table.insert("", "end", values=row)
+
+        conn.close()
+
+    except sqlite3.Error as e:
+        messagebox.showerror("Error", f"Error accessing the database: {str(e)}")
+
+    # Pack the product table
+    product_table.pack()
+
+def open_employee_table_window():
+    # Create a new window
+    product_table_window = tk.Toplevel(window)
+    product_table_window.title("Tabla de Productos")
+
+    # Create a Treeview widget to display the table
+    product_table = ttk.Treeview(product_table_window, columns=("username", "nombre", "apellido_paterno", "apellido_materno"), show="headings")
+    product_table.heading("username", text="username")
+    product_table.heading("nombre", text="nombre")
+    product_table.heading("apellido_paterno", text="apellido_paterno")
+    product_table.heading("apellido_materno", text="apellido_materno")
+
+    # Connect to the database and retrieve the product data
+    try:
+        conn = sqlite3.connect("BaseDeDatos/ElUltimoJardin.db")  # Replace with the actual database file name
+        cursor = conn.cursor()
+
+        # Retrieve product data from the database
+        cursor.execute("SELECT username, nombre, apellido_paterno, apellido_materno FROM empleados")
+        rows = cursor.fetchall()
+
+        # Insert the product data into the table
+        for row in rows:
+            product_table.insert("", "end", values=row)
+
+        conn.close()
+
+    except sqlite3.Error as e:
+        messagebox.showerror("Error", f"Error accessing the database: {str(e)}")
+
+    # Pack the product table
+    product_table.pack()
+
 
 def move_table():
     # Add code here to handle the "Mover Mesa" button functionality
@@ -18,14 +85,31 @@ def delete_product():
     # Add code here to handle the "Eliminar Producto" button functionality
     pass
 
-def change_color(label):
-    # Add code here to handle changing the color of the clicked label
-    pass
+def change_color(event):
+    label = event.widget  # Get the label widget that triggered the event
+    mesa_valor_entry.config(state="normal")  # Set the entry field to normal state
+    mesa_valor_entry.delete(0, tk.END)  # Clear the current input value
+    mesa_valor_entry.insert(0, label["text"])  # Set the clicked label's text as the input value
+    mesa_valor_entry.config(state="readonly")  # Se
 
 # Create the Tkinter window
 window = tk.Tk()
 window.title("Cafetería")
 window.geometry("1000x600")
+
+# Connect to SQLite database
+connection = sqlite3.connect("BaseDeDatos/ElUltimoJardin.db")
+cursor = connection.cursor()
+
+# Fetch usernames from empleados database
+cursor.execute("SELECT username FROM empleados")
+usernames = cursor.fetchall()
+
+# Close the database connection
+connection.close()
+
+# Convert the usernames to a list
+usernames = [username[0] for username in usernames]
 
 # Menu Bar
 menu_bar = tk.Menu(window)
@@ -38,6 +122,8 @@ file_menu = tk.Menu(menu_bar, tearoff=0)
 # file_menu.add_separator()
 # file_menu.add_command(label="Salir", command=window.quit)
 menu_bar.add_cascade(label="Productos", menu=file_menu)
+file_menu.add_command(label="Productos", command=open_product_table_window)
+
 
 # Edit Menu
 edit_menu = tk.Menu(menu_bar, tearoff=0)
@@ -45,6 +131,7 @@ edit_menu = tk.Menu(menu_bar, tearoff=0)
 # edit_menu.add_command(label="Copy")
 # edit_menu.add_command(label="Paste")
 menu_bar.add_cascade(label="Empleados", menu=edit_menu)
+edit_menu.add_command(label="Empleados", command=open_employee_table_window)
 
 # View Menu
 view_menu = tk.Menu(menu_bar, tearoff=0)
@@ -66,8 +153,8 @@ fecha_valor_label.grid(row=0, column=1, padx=10)
 mesero_label = ttk.Label(details_frame, text="Mesero:")
 mesero_label.grid(row=0, column=2, sticky="e")
 
-mesero_combo = ttk.Combobox(details_frame, values=["Nombre"], state="readonly")
-mesero_combo.set("Nombre")
+mesero_combo = ttk.Combobox(details_frame, values=usernames, state="readonly")
+mesero_combo.set(usernames[0] if usernames else "")
 mesero_combo.grid(row=0, column=3, padx=10)
 
 mesa_label = ttk.Label(details_frame, text="Mesa seleccionada:")
@@ -118,7 +205,7 @@ label_names = ["Mesa 1", "Mesa 2", "Mesa 3", "Mesa 4",
 for name in label_names:
     label = ttk.Label(images_frame, text=name, relief="solid", width=20)
     label.pack(padx=10, pady=10)
-    label.bind("<Button-1>", lambda event, l=label: change_color(l))
+    label.bind("<Button-1>", change_color)
 
 window.mainloop()
 
