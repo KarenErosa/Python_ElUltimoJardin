@@ -11,7 +11,8 @@ class ViewRegistrarTrabajador(tk.Toplevel):
     #y se definen los elementos que tendrá la ventana
     def __init__(self, parent):
         super().__init__(parent)
-        self.main_window = parent;
+        self.main_window = parent
+        
         # Crear la ventana
         self.title("Registro de Trabajador")
         self.geometry("700x600")  # Cambia el tamaño de la ventana (ancho x alto)
