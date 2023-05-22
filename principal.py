@@ -293,27 +293,32 @@ class MainWindow(tk.Tk):
         self.clear_table()
     
     def venta(self):
-        # Connect to the database and retrieve the product data
-        fecha = datetime.now().strftime("%d/%m/%Y")
-        hora = datetime.now().strftime("%H:%M:%S")
-        for item in self.table.get_children():
-            values = self.table.item(item)['values']
-            print(values)
+        
             
         try:
-            conn = sqlite3.connect("BaseDeDatos/ElUltimoJardin.db")  # Replace with the actual database file name
-            cursor = conn.cursor()
+            if self.total_table[self.mesa_valor_entry.get()] != 0:
+                # Connect to the database and retrieve the product data
+                conn = sqlite3.connect("BaseDeDatos/ElUltimoJardin.db")  # Replace with the actual database file name
+                cursor = conn.cursor()
 
-            # Retrieve product data from the database
-            cursor.execute("SELECT username, nombre, apellido_paterno, apellido_materno FROM empleados")
-            rows = cursor.fetchall()
-
-            # Insert the product data into the table
-            # for row in rows:
-            #     product_table.insert("", "end", values=row)
-
-            conn.close()
-
+                    # Retrieve product data from the database
+                cursor.execute("SELECT id FROM empleados WHERE username = ?", (self.mesero_combo.get(),))
+                row = cursor.fetchone() 
+                empleado_id = row[0]
+                fecha = datetime.now().strftime("%d/%m/%Y")
+                hora = datetime.now().strftime("%H:%M:%S")
+                total_venta = self.total_table[self.mesa_valor_entry.get()]
+                # for item in self.table.get_children():
+                #     values = self.table.item(item)['values']
+                #     print(values)
+                cursor.execute("INSERT INTO ventas (fecha, hora, total_venta, empleado_id) VALUES (?, ?, ?, ?)", (fecha, hora, total_venta, empleado_id))
+                conn.commit()
+                conn.close()
+                messagebox.showinfo("Venta", "Venta registrada")
+                self.total_table[self.mesa_valor_entry.get()] = 0
+                self.total_table[self.mesa_valor_entry.get()]
+                self.data_table[self.mesa_valor_entry.get()] = []
+                self.clear_table()
         except sqlite3.Error as e:
             messagebox.showerror("Error", f"Error accessing the database: {str(e)}")
          
