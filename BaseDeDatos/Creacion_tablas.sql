@@ -7,9 +7,8 @@ CREATE TABLE categorias (
 CREATE TABLE productos (
   id INTEGER PRIMARY KEY AUTOINCREMENT,
   categoria_id INTEGER,
-  nombre TEXT,
+  nombre TEXT UNIQUE,
   precio REAL,
-  descuento REAL,
   FOREIGN KEY (categoria_id) REFERENCES categorias(id)
 );
 
@@ -21,28 +20,16 @@ CREATE TABLE empleados (
   apellido_materno TEXT,
   horario TEXT,
   username TEXT UNIQUE,
-  password TEXT
-);
-
--- Crear tabla de mesas
-CREATE TABLE mesas (
-  id INTEGER PRIMARY KEY AUTOINCREMENT,
-  nombre_mesa TEXT,
-  ocupada INTEGER,
-  comensales INTEGER,
-  empleado_id TEXT,
-  FOREIGN KEY (empleado_id) REFERENCES empleados(id)
+  contrasena TEXT
 );
 
 CREATE TABLE ventas (
   id INTEGER PRIMARY KEY AUTOINCREMENT,
-  folio INTEGER,
   fecha TEXT,
   hora TEXT,
-  mesa_id INTEGER,
-  descuento REAL,
   total_venta REAL,
-  FOREIGN KEY (mesa_id) REFERENCES mesas(id)
+  empleado_id TEXT,
+  FOREIGN KEY (empleado_id) REFERENCES empleados(id)
 );
 
 -- Crear tabla de productos_vendidos
