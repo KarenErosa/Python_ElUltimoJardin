@@ -1,6 +1,7 @@
 import sqlite3
 import tkinter as tk
 from tkinter import ttk
+from tkinter import messagebox
 
 class Orden:
     # Create the Tkinter window
@@ -35,38 +36,39 @@ class Orden:
             valores=producto['values']
             cantidad = cantidad_entry.get()
             precio=float(valores[2])
+            try:
+                cant=int(cantidad)
 
-        try:
-            cant=float(cantidad)
+                if cant>0:
+                    total =  cant* precio
+                    valores.append(cantidad)
+                    valores.append(total)
+                    # Calculate the total
+                    i=0
+                    bnd=True
+                    while bnd and i<len(self.prod_add):
+                        if self.prod_add[i][0]==valores[0]:
+                            bnd=False
+                        i+=1
 
-            if cant>0:
-                total =  cant* precio
-                valores.append(cantidad)
-                valores.append(total)
-                # Calculate the total
-                i=0
-                bnd=True
-                while bnd and i<len(self.prod_add):
-                    if self.prod_add[i][0]==valores[0]:
-                        bnd=False
-                    i+=1
+                    if bnd:
+                        self.prod_add.append(valores)
+                    else:
+                        i-=1
+                        self.totalT-=self.prod_add[i][4]
+                        self.prod_add[i][3]=cantidad
+                        self.prod_add[i][4]=total
 
-                if bnd:
-                    self.prod_add.append(valores)
-                else:
-                    i-=1
-                    self.totalT-=self.prod_add[i][4]
-                    self.prod_add[i][3]=cantidad
-                    self.prod_add[i][4]=total
+                    print(self.prod_add)
+                    self.totalT+=total
+                    # Display the total
+                    total_label.config(text=f"Total: ${self.totalT:.2f}")
 
-                print(self.prod_add)
-                self.totalT+=total
-                # Display the total
-                total_label.config(text=f"Total: ${self.totalT:.2f}")
-
-                # Add code here to perform any other actions you need when "Agregar" button is clicked
-        except Exception as e:
-            print(e)
+                    # Add code here to perform any other actions you need when "Agregar" button is clicked
+            except Exception as e:
+                messagebox.showinfo("Information", "Ingresa una cantidad valida")
+        else:
+            messagebox.showinfo("Information", "Selecciona un producto de la tabla")
 
 
     def search_product(self):
