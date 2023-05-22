@@ -48,6 +48,7 @@ class MainWindow(tk.Tk):
         # View Menu
         view_menu = tk.Menu(menu_bar, tearoff=0)
         menu_bar.add_cascade(label="Ventas", menu=view_menu)
+        view_menu.add_command(label="Ver", command=self.open_venta_table_window)
 
         # Transaction Details
         details_frame = ttk.Frame(self)
@@ -204,7 +205,7 @@ class MainWindow(tk.Tk):
     def open_employee_table_window(self):
         # Create a new window
         product_table_window = tk.Toplevel(self)
-        product_table_window.title("Tabla de Productos")
+        product_table_window.title("Tabla de empleados")
 
         # Create a Treeview widget to display the table
         product_table = ttk.Treeview(product_table_window, columns=("username", "nombre", "apellido_paterno", "apellido_materno"), show="headings")
@@ -220,6 +221,39 @@ class MainWindow(tk.Tk):
 
             # Retrieve product data from the database
             cursor.execute("SELECT username, nombre, apellido_paterno, apellido_materno FROM empleados")
+            rows = cursor.fetchall()
+
+            # Insert the product data into the table
+            for row in rows:
+                product_table.insert("", "end", values=row)
+
+            conn.close()
+
+        except sqlite3.Error as e:
+            messagebox.showerror("Error", f"Error accessing the database: {str(e)}")
+
+        # Pack the product table
+        product_table.pack()
+    
+    def open_venta_table_window(self):
+        # Create a new window
+        product_table_window = tk.Toplevel(self)
+        product_table_window.title("Tabla de Ventas")
+
+        # Create a Treeview widget to display the table
+        product_table = ttk.Treeview(product_table_window, columns=("fecha", "hora", "total_venta", "empleado_id"), show="headings")
+        product_table.heading("fecha", text="fecha")
+        product_table.heading("hora", text="hora")
+        product_table.heading("total_venta", text="total_venta")
+        product_table.heading("empleado_id", text="empleado_id")
+
+        # Connect to the database and retrieve the product data
+        try:
+            conn = sqlite3.connect("BaseDeDatos/ElUltimoJardin.db")  # Replace with the actual database file name
+            cursor = conn.cursor()
+
+            # Retrieve product data from the database
+            cursor.execute("SELECT fecha, hora, total_venta, empleado_id FROM ventas")
             rows = cursor.fetchall()
 
             # Insert the product data into the table
