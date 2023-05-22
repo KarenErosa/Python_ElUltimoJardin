@@ -20,7 +20,7 @@ CREATE TABLE empleados (
   apellido_paterno TEXT,
   apellido_materno TEXT,
   horario TEXT,
-  username TEXT,
+  username TEXT UNIQUE,
   password TEXT
 );
 
