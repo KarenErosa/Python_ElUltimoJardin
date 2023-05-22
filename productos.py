@@ -4,6 +4,7 @@ from tkinter import ttk
 
 class Orden:
     # Create the Tkinter window
+
     window = None
     table = None
     combo = None
@@ -14,14 +15,15 @@ class Orden:
     total_label = None
     
 
-    def __init__(self):
+    def __init__(self, main_window):
         self.prod_add=[]
         self.totalT=0
+        self.main_window = main_window
     
-    def foo(self):
+    def foo(self, ):
         self.prod_add=[]
         self.totalT=0
-    # Sample data for the food products and prices
+        
 
 
     def agregar(self):
@@ -83,7 +85,7 @@ class Orden:
 
 
     def obtener_valor(self):
-        self.totalT
+        self.main_window.update_table(self.prod_add, self.totalT)
         window.destroy()  # Cierra la ventana actual al obtener el valor
         return self.prod_add,self.totalT
 
@@ -106,13 +108,13 @@ class Orden:
             for product in products:
                 table.insert("", "end", values=(product["id"],product["producto"], product["precio"]))
 
-    def mostrar(self):
+    def mostrar(self, main_window):
         global window
         window = tk.Tk()
         window.title("Orden")
         global table
         table=ttk.Treeview(window, columns=("id","producto", "precio"), show="headings", displaycolumns=("1","2"))
-        orden=Orden()
+        orden=Orden(main_window)
         conn=None
         try:
             conn=sqlite3.connect('BaseDeDatos/ElUltimoJardin.db')
