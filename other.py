@@ -2,6 +2,7 @@ import tkinter as tk
 from tkinter import ttk
 from tkinter import scrolledtext
 from datetime import date
+from main import Orden
 
 def move_table():
     # Add code here to handle the "Mover Mesa" button functionality
@@ -9,7 +10,9 @@ def move_table():
 
 def add_product():
     # Add code here to handle the "Agregar Producto" button functionality
-    pass
+    orden=Orden()
+    orden.foo()
+    orden.mostrar()
 
 def delete_product():
     # Add code here to handle the "Eliminar Producto" button functionality

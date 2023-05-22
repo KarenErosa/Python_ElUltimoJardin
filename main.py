@@ -3,6 +3,16 @@ import tkinter as tk
 from tkinter import ttk
 
 class Orden:
+    # Create the Tkinter window
+    window = None
+    table = None
+    combo = None
+    categorias = None
+    products = None
+    producto_entry = None
+    cantidad_entry = None
+    total_label = None
+    
 
     def __init__(self):
         self.prod_add=[]
@@ -15,6 +25,8 @@ class Orden:
 
 
     def agregar(self):
+        global cantidad_entry
+        global total_label
         selected_product = table.focus()
         if selected_product:
             producto=table.item(selected_product)
@@ -56,6 +68,9 @@ class Orden:
 
 
     def search_product(self):
+        global products
+        global producto_entry
+        global table
         search_query = producto_entry.get().lower()
         matching_products = [product for product in products if search_query in product["producto"].lower()]
 
@@ -73,6 +88,9 @@ class Orden:
         return self.prod_add,self.totalT
 
     def on_option_selected(self,event):
+        global combo
+        global table
+        global categorias
         index = combo.current()
         assigned_value = categorias[index][1]
 
@@ -88,89 +106,99 @@ class Orden:
             for product in products:
                 table.insert("", "end", values=(product["id"],product["producto"], product["precio"]))
 
-if __name__=='__main__':
-    orden=Orden()
-    conn=None
-    try:
-        conn=sqlite3.connect('BaseDeDatos/ElUltimoJardin.db')
-    except:
-        print('No se conecto a la base de datos')
+    def mostrar(self):
+        global window
+        window = tk.Tk()
+        window.title("Orden")
+        global table
+        table=ttk.Treeview(window, columns=("id","producto", "precio"), show="headings", displaycolumns=("1","2"))
+        orden=Orden()
+        conn=None
+        try:
+            conn=sqlite3.connect('BaseDeDatos/ElUltimoJardin.db')
+        except:
+            print('No se conecto a la base de datos')
 
-    cur=conn.cursor()
-    cur.execute("SELECT id,nombre,precio,categoria_id FROM productos")
+        cur=conn.cursor()
+        cur.execute("SELECT id,nombre,precio,categoria_id FROM productos")
 
-    datos=cur.fetchall()
+        datos=cur.fetchall()
 
-    products=[]
+        global products
 
-    for dato in datos:
-        col={"id":dato[0],"producto":dato[1],"precio":dato[2],"categoria":dato[3]}
-        products.append(col)
+        products=[]
 
-    # Create the Tkinter window
-    window = tk.Tk()
-    window.title("Orden")
+        for dato in datos:
+            col={"id":dato[0],"producto":dato[1],"precio":dato[2],"categoria":dato[3]}
+            products.append(col)
 
-    # Create a search bar for product search
-    producto_label = ttk.Label(window, text="Producto:")
-    producto_label.pack()
 
-    producto_entry = ttk.Entry(window)
-    producto_entry.pack()
 
-    search_button = ttk.Button(window, text="Buscar", command=orden.search_product)
-    search_button.pack()
+        # Create a search bar for product search
+        producto_label = ttk.Label(window, text="Producto:")
+        producto_label.pack()
 
-    # Create a combobox for selecting the food category
-    combo_label = ttk.Label(window, text="Categoría:")
-    combo_label.pack()
+        global producto_entry
 
-    cur.execute("SELECT id,nombre FROM categorias")
+        producto_entry = ttk.Entry(window)
+        producto_entry.pack()
 
-    datos=cur.fetchall()
+        search_button = ttk.Button(window, text="Buscar", command=orden.search_product)
+        search_button.pack()
 
-    categorias=[('Todo',0)]
+        # Create a combobox for selecting the food category
+        combo_label = ttk.Label(window, text="Categoría:")
+        combo_label.pack()
 
-    for dato in datos:
-        col=(dato[1],dato[0])
-        categorias.append(col)
+        cur.execute("SELECT id,nombre FROM categorias")
 
-    combo_text = [option[0] for option in categorias]
-    combo = ttk.Combobox(window, values=combo_text)
-    combo.pack()
+        datos=cur.fetchall()
 
-    combo.set('Todo')
+        global categorias
+        categorias=[('Todo',0)]
 
-    combo.option_add("*TCombobox*Listbox.selectBackground", "lightblue")
+        for dato in datos:
+            col=(dato[1],dato[0])
+            categorias.append(col)
 
-    combo.bind('<<ComboboxSelected>>',orden.on_option_selected)
+        combo_text = [option[0] for option in categorias]
+        global combo
+        combo = ttk.Combobox(window, values=combo_text)
+        combo.pack()
 
-    # Create a table to display the products and prices
-    table = ttk.Treeview(window, columns=("id","producto", "precio"), show="headings", displaycolumns=("1","2"))
-    table.heading("producto", text="Producto")
-    table.heading("precio", text="Precio")
+        combo.set('Todo')
 
-    for product in products:
-        table.insert("", "end", values=(product["id"],product["producto"], product["precio"]))
+        combo.option_add("*TCombobox*Listbox.selectBackground", "lightblue")
 
-    table.pack()
+        combo.bind('<<ComboboxSelected>>',orden.on_option_selected)
 
-    # Create a field for entering the quantity
-    cantidad_label = ttk.Label(window, text="Cantidad:")
-    cantidad_label.pack()
-    cantidad_entry = ttk.Entry(window)
-    cantidad_entry.pack()
+        # Create a table to display the products and prices
+        table.heading("producto", text="Producto")
+        table.heading("precio", text="Precio")
 
-    # Create a label to display the total
-    total_label = ttk.Label(window, text="Total: $0.00")
-    total_label.pack()
+        for product in products:
+            table.insert("", "end", values=(product["id"],product["producto"], product["precio"]))
 
-    # Create a button to add the item
-    agregar_button = ttk.Button(window, text="Agregar", command=orden.agregar)
-    agregar_button.pack()
+        table.pack()
 
-    button = ttk.Button(window, text="Confirmar", command=orden.obtener_valor)
-    button.pack()
+        # Create a field for entering the quantity
+        cantidad_label = ttk.Label(window, text="Cantidad:")
+        cantidad_label.pack()
+        global cantidad_entry
+        cantidad_entry = ttk.Entry(window)
+        cantidad_entry.pack()
 
-    # Start the Tkinter event loop
-    window.mainloop()
+        # Create a label to display the total
+        global total_label
+        total_label = ttk.Label(window, text="Total: $0.00")
+        total_label.pack()
+
+        # Create a button to add the item
+        agregar_button = ttk.Button(window, text="Agregar", command=orden.agregar)
+        agregar_button.pack()
+
+        button = ttk.Button(window, text="Confirmar", command=orden.obtener_valor)
+        button.pack()
+
+        # Start the Tkinter event loop
+        window.mainloop()
