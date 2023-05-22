@@ -2,7 +2,7 @@ import tkinter as tk
 from tkinter import ttk
 from tkinter import scrolledtext
 from datetime import date
-from main import Orden
+from productos import Orden
 
 def move_table():
     # Add code here to handle the "Mover Mesa" button functionality
