@@ -4,6 +4,7 @@ from tkinter import scrolledtext
 from datetime import date
 from productos import Orden
 from registrar_empleados import ViewRegistrarTrabajador
+from main_productos import ViewProductos
 import sqlite3
 from tkinter import messagebox
 from datetime import datetime
@@ -38,6 +39,7 @@ class MainWindow(tk.Tk):
         file_menu = tk.Menu(menu_bar, tearoff=0)
         menu_bar.add_cascade(label="Productos", menu=file_menu)
         file_menu.add_command(label="Ver", command=self.open_product_table_window)
+        file_menu.add_command(label="Productos...", command=self.main_product)
 
         # Edit Menu
         edit_menu = tk.Menu(menu_bar, tearoff=0)
@@ -418,6 +420,9 @@ class MainWindow(tk.Tk):
     def empleados_add(self):
         empleados = ViewRegistrarTrabajador(self)
         empleados.mainloop()
+    def main_product(self):
+        producto = ViewProductos(self)
+        producto.mainloop()
 
 # Create an instance of the MainWindow class and run the application
 if __name__ == "__main__":
